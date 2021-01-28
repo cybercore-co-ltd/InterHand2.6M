@@ -15,6 +15,7 @@ import torch
 import torchvision.transforms as transforms
 from torch.nn.parallel.data_parallel import DataParallel
 import torch.backends.cudnn as cudnn
+from mmdet.apis import inference_detector, init_detector
 
 sys.path.insert(0, osp.join('..', 'main'))
 sys.path.insert(0, osp.join('..', 'data'))
@@ -52,10 +53,10 @@ cudnn.benchmark = True
 joint_num = 21 # single hand
 root_joint_idx = {'right': 20, 'left': 41}
 joint_type = {'right': np.arange(0,joint_num), 'left': np.arange(joint_num,joint_num*2)}
-skeleton = load_skeleton(osp.join('../data/InterHand2.6M/annotations/skeleton.txt'), joint_num*2)
+skeleton = load_skeleton(osp.join('/data/hand_pose/InterHand2.6M/annotations/skeleton.txt'), joint_num*2)
 
 # snapshot load
-model_path = './snapshot_%d.pth.tar' % int(args.test_epoch)
+model_path = '/home/member/Workspace/son/projects/hand_pose/InterHand2.6M/output/model_dump/snapshot_%d.pth.tar' % int(args.test_epoch)
 assert osp.exists(model_path), 'Cannot find model at ' + model_path
 print('Load checkpoint from {}'.format(model_path))
 model = get_model('test', joint_num)
@@ -66,12 +67,18 @@ model.eval()
 
 # prepare input image
 transform = transforms.ToTensor()
-img_path = 'input.jpg'
+img_path = '/home/member/Workspace/son/projects/hand_pose/InterHand2.6M/demo/2249552.jpg'
 original_img = cv2.imread(img_path)
+original_img = cv2.resize(original_img, (512, 334))
+# cv2.imwrite("/home/member/Workspace/son/projects/hand_pose/InterHand2.6M/demo/resized.jpg", img_new)
 original_img_height, original_img_width = original_img.shape[:2]
 
 # prepare bbox
-bbox = [69, 137, 165, 153] # xmin, ymin, width, height
+# bbox = [69, 137, 165, 153] # xmin, ymin, width, height
+# bbox = [0, 0, original_img_width, original_img_height]
+bbox = [159, 24, 426-159, 260-24]
+img_draw = cv2.rectangle(original_img, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+ bbox[3]), (255,0,0), 3)
+cv2.imwrite("/home/member/Workspace/son/projects/hand_pose/InterHand2.6M/demo/draw_box.jpg",img_draw)
 bbox = process_bbox(bbox, (original_img_height, original_img_width, original_img_height))
 img, trans, inv_trans = generate_patch_image(original_img, bbox, False, 1.0, 0.0, cfg.input_img_shape)
 img = transform(img.astype(np.float32))/255

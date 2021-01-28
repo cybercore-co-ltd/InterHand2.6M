@@ -26,12 +26,12 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(self, transform, mode, annot_subset):
         self.mode = mode # train, test, val
         self.annot_subset = annot_subset # all, human_annot, machine_annot
-        self.img_path = '../data/InterHand2.6M/images'
-        self.annot_path = '../data/InterHand2.6M/annotations'
+        self.img_path = '/data/hand_pose/InterHand2.6M/images'
+        self.annot_path = '/data/hand_pose/InterHand2.6M/annotations'
         if self.annot_subset == 'machine_annot' and self.mode == 'val':
-            self.rootnet_output_path = '../data/InterHand2.6M/rootnet_output/rootnet_interhand2.6m_output_machine_annot_val.json'
+            self.rootnet_output_path = '/data/hand_pose/InterHand2.6M/rootnet_output/rootnet_interhand2.6m_output_machine_annot_val.json'
         else:
-            self.rootnet_output_path = '../data/InterHand2.6M/rootnet_output/rootnet_interhand2.6m_output_all_test.json'
+            self.rootnet_output_path = '/data/hand_pose/InterHand2.6M/rootnet_output/rootnet_interhand2.6m_output_all_test.json'
         self.transform = transform
         self.joint_num = 21 # single hand
         self.root_joint_idx = {'right': 20, 'left': 41}

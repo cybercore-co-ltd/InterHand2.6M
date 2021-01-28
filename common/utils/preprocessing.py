@@ -11,11 +11,49 @@ import numpy as np
 from config import cfg
 import random
 import math
+COCO_PATH = "/data/coco/images/train2017/"
+list_img = os.listdir(COCO_PATH)
+def get_random_crop(image, crop_height, crop_width):
+
+    max_x = image.shape[1] - crop_width
+    max_y = image.shape[0] - crop_height
+
+    x = np.random.randint(0, max(max_x,1))
+    y = np.random.randint(0, max(max_y,1))
+
+    crop = image[y: y + crop_height, x: x + crop_width]
+
+    return crop
+
 
 def load_img(path, order='RGB'):
     
     # load
+    # import ipdb; ipdb.set_trace()
+    do_aug = [0,1]
     img = cv2.imread(path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+    # print("shape :", img.shape)
+    np.random.shuffle(do_aug)
+    if do_aug[0]==1:
+        img_0 = img[:,:,0]<30
+        img_1 = img[:,:,1]<30
+        img_2 = img[:,:,2]<30
+        img_idx = img_0*img_1*img_2
+
+        img_0 = img[:,:,0]>230
+        img_1 = img[:,:,1]>230
+        img_2 = img[:,:,2]>230
+
+        img_idx_2 = img_0*img_1*img_2
+        coco_img =  cv2.imread(os.path.join(COCO_PATH, list_img[0]), cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+        np.random.shuffle(list_img)
+        while coco_img.shape[0]< img.shape[0] or coco_img.shape[1]< img.shape[1]:
+            np.random.shuffle(list_img)
+            coco_img  = cv2.imread(os.path.join(COCO_PATH, list_img[0]), cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+        crop_img = get_random_crop(coco_img, img.shape[0], img.shape[1])
+        img[img_idx] = crop_img[img_idx]
+        img[img_idx_2] = crop_img[img_idx_2]
+    # cv2.imwrite(os.path.join("/home/member/Workspace/son/projects/hand_pose/InterHand2.6M/test_out", path.split('/')[-1]), img)
     if not isinstance(img, np.ndarray):
         raise IOError("Fail to read %s" % path)
 
