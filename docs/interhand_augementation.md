@@ -14,8 +14,8 @@ Results of original Interhand2.6 model on released test set:
 Results of original Interhand2.6 model on internet images:
 | Test image | 3D pose  graph|
 |:------------:|:-------:|
-|![](./images/resized20_result_2d.jpg)|![](./images/resized20_result_3d.png)|
-|![](./images/test320_result_2d.jpg)|![](./images/test320_result_3d.png)||
+|<img src="./images/resized20_result_2d.jpg" width="512">|<img src="./images/resized20_result_3d.png" width="512">|
+|<img src="./images/test320_result_2d.jpg" width="512">|<img src="./images/test320_result_3d.png" width="512">|
 The above images show that the original model does not output high-quality results on the complexity background context as well as data outside the training set. In order to eliminate this issue, we continue to retrain the original model with a more complex background context.
 ## II. Implementation
 - As introduced before, we augment the background of training images by replacing the black background with random images in the COCO dataset. The replacing will be done online with the probability of 0.5
